@@ -1,6 +1,7 @@
 package com.example.ecommerce.service;
 
 import java.util.List;
+import com.example.ecommerce.entity.Category;
 
 import javax.management.RuntimeErrorException;
 
@@ -60,5 +61,11 @@ public  Page<Product> searchProducts(String keyword,int page,int size){
             .orElseThrow(() -> new RuntimeException("Product not found"));
 
     productRepositary.delete(product);
+}
+public Page<Product> getProductsByCategory(Category category, int page, int size) {
+
+    Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+
+    return productRepositary.findByCategory(category, pageable);
 }
 }

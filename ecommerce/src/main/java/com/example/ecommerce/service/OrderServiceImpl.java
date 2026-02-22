@@ -41,23 +41,23 @@ public class OrderServiceImpl implements OrderService {
     Product product = cartItem.getProduct();
 
     // ✅ Check stock
-    if (product.getStock() < cartItem.getQuanity()) {
+    if (product.getStock() < cartItem.getQuantity()) {
         throw new RuntimeException("Insufficient stock for " + product.getName());
     }
 
     // ✅ Reduce stock
-    product.setStock(product.getStock() - cartItem.getQuanity());
+    product.setStock(product.getStock() - cartItem.getQuantity());
     productRepositary.save(product);
 
     OrderItem orderItem = new OrderItem();
     orderItem.setOrder(order);
     orderItem.setProduct(product);
-    orderItem.setQuanity(cartItem.getQuanity());
+    orderItem.setQuanity(cartItem.getQuantity());
     orderItem.setPrice(product.getPrice());
 
     order.getOrderItems().add(orderItem);
 
-    totalAmount += product.getPrice() * cartItem.getQuanity();
+    totalAmount += product.getPrice() * cartItem.getQuantity();
 }
 
         order.setTotalAmount(totalAmount);

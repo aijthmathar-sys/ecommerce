@@ -3,6 +3,8 @@ package com.example.ecommerce.controller;
 import java.util.List;
 import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
+
+import com.example.ecommerce.entity.Category;
 import com.example.ecommerce.entity.Product;
 import com.example.ecommerce.service.ProductService;
 import org.springframework.data.domain.Page;
@@ -55,5 +57,16 @@ public Page<Product> searchProducts(
     size = Math.min(Math.max(size, 1), 20);
 
     return productService.searchProducts(keyword, page, size);
+}
+@GetMapping("/category/{category}")
+public Page<Product> getByCategory(
+        @PathVariable Category category,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "5") int size) {
+
+    page = Math.max(page, 0);
+    size = Math.min(Math.max(size, 1), 20);
+
+    return productService.getProductsByCategory(category, page, size);
 }
 }

@@ -31,7 +31,7 @@ public class Order {
    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    private Long UserId;
+    private Long userId;
     private Double totalAmount;
     private LocalDateTime orderDate;
     private String status;

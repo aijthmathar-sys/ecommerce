@@ -26,7 +26,7 @@ public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private int quanity;
+    private int quantity;
     @ManyToOne
     @JoinColumn(name="cartid")
     @JsonBackReference

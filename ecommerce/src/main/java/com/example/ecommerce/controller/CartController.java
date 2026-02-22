@@ -1,40 +1,57 @@
 package com.example.ecommerce.controller;
 
+import com.example.ecommerce.dto.CartRequest;
 import com.example.ecommerce.entity.Cart;
+import com.example.ecommerce.entity.User;
 import com.example.ecommerce.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/cart")
-@CrossOrigin("*")
+@RequestMapping("/cart")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class CartController {
 
     @Autowired
     private CartService cartService;
 
-    // ✅ Add Product to Cart
     @PostMapping("/add")
     public Cart addToCart(
-            @RequestParam Long userId,
-            @RequestParam Long productId,
-            @RequestParam int quantity) {
+            @RequestBody CartRequest request,
+            Authentication authentication) {
 
-        return cartService.addToCart(userId, productId, quantity);
+        User user = (User) authentication.getPrincipal();
+
+        return cartService.addToCart(
+                user.getId(),
+                request.getProductId(),
+                1
+        );
     }
 
-    // ✅ Get Cart by UserId
-    @GetMapping("/{userId}")
-    public Cart getCart(@PathVariable Long userId) {
-        return cartService.getCartByUserId(userId);
+    @GetMapping
+    public Cart getCart(Authentication authentication) {
+
+        User user = (User) authentication.getPrincipal();
+        return cartService.getCartByUserId(user.getId());
     }
 
-    // ✅ Remove Product from Cart
     @DeleteMapping("/remove")
     public void removeFromCart(
-            @RequestParam Long userId,
-            @RequestParam Long productId) {
+            @RequestParam Long productId,
+            Authentication authentication) {
 
-        cartService.removeFromCart(userId, productId);
+        User user = (User) authentication.getPrincipal();
+        cartService.removeFromCart(user.getId(), productId);
     }
+    @PutMapping("/update")
+public Cart updateQuantity(
+        @RequestParam Long productId,
+        @RequestParam int change,
+        Authentication authentication) {
+
+    User user = (User) authentication.getPrincipal();
+    return cartService.updateQuantity(user.getId(), productId, change);
+}
 }

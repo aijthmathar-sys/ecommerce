@@ -1,5 +1,7 @@
 package com.example.ecommerce.entity;
 
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.annotation.Generated;
@@ -36,9 +38,11 @@ public class User {
 
     @Column(unique = true)
     private String email;
-    @JsonIgnore
+    
     private String password;
 
     @Enumerated(EnumType.STRING)
     private Role role;
+    private String otp;
+    private LocalDateTime otpExpiry;
 }

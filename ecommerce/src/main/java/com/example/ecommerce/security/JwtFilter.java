@@ -36,12 +36,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
-        // 🔥 Skip login & register
-        if (path.startsWith("/api/auth")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+if (path.equals("/api/auth/login") || 
+    path.equals("/api/auth/register")) {
+    filterChain.doFilter(request, response);
+    return;
+}
 
+        // 🔥 Skip login & register
+       
         String token = null;
 
         if (request.getCookies() != null) {
@@ -67,6 +69,8 @@ public class JwtFilter extends OncePerRequestFilter {
                         );
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
+                System.out.println("token="+token);
+                System.out.println("valid="+jwtUtil.validateToken(token));
             }
         }
 

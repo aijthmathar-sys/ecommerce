@@ -1,9 +1,13 @@
 package com.example.ecommerce.entity;
 
+import com.example.ecommerce.entity.Category;
+
 import org.springframework.boot.autoconfigure.web.WebProperties.Resources.Chain.Strategy;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,7 +24,7 @@ import lombok.NoArgsConstructor;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
     @Column(nullable = false)
     private String name;
 
@@ -31,6 +35,9 @@ public class Product {
 
     private int stock;
     private String imageurl;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Category category;
     
     
 

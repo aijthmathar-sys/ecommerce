@@ -1,5 +1,7 @@
 package com.example.ecommerce.service;
 
+import java.time.LocalDateTime;
+
 import javax.management.RuntimeErrorException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,8 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private EmailService emailService;
 
     public User register(User user){
         if(userRepository.existsByEmail(user.getEmail()))
@@ -47,5 +51,38 @@ public class UserService {
     }
 
     return user;
+}
+public void sendOtp(String email) {
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    String otp = String.valueOf((int)(Math.random() * 900000) + 100000);
+
+    user.setOtp(otp);
+    user.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
+
+    userRepository.save(user);
+
+    emailService.sendOtp(email, otp);
+}
+public void resetPassword(String email, String otp, String newPassword) {
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    if (user.getOtp() == null ||
+        !user.getOtp().equals(otp) ||
+        user.getOtpExpiry().isBefore(LocalDateTime.now())) {
+
+        throw new RuntimeException("Invalid or Expired OTP");
+    }
+
+    user.setPassword(passwordEncoder.encode(newPassword));
+
+    user.setOtp(null);
+    user.setOtpExpiry(null);
+
+    userRepository.save(user);
 }
 }

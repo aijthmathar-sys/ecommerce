@@ -6,10 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.ecommerce.entity.Cart;
 
-public interface CartRepository extends JpaRepository<Cart,Long> {
+public interface CartRepository extends JpaRepository<Cart, Long> {
 
-Optional<Cart> findByUserId(Long userId);
-    
+    Optional<Cart> findByUserId(Long userId);
 } 
-    
 
