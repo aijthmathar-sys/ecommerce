@@ -47,7 +47,7 @@ class CartServiceImplTest {
 
         cartItem = new CartItem();
         cartItem.setProduct(product);
-        cartItem.setQuanity(2);
+        cartItem.setQuantity(2);
 
         cart = new Cart();
         cart.setUserId(100L);
@@ -68,7 +68,7 @@ class CartServiceImplTest {
         Cart result = cartService.addToCart(100L, 1L, 3);
 
         assertEquals(1, result.getCartItems().size());
-        assertEquals(5, result.getCartItems().get(0).getQuanity()); // 2 + 3
+        assertEquals(5, result.getCartItems().get(0).getQuantity()); // 2 + 3
         verify(cartRepository).save(cart);
     }
 
@@ -121,7 +121,7 @@ class CartServiceImplTest {
         Product anotherProduct = new Product();
         anotherProduct.setId(2L);
         anotherItem.setProduct(anotherProduct);
-        anotherItem.setQuanity(1);
+        anotherItem.setQuantity(1);
 
         cart.getCartItems().add(cartItem);
         cart.getCartItems().add(anotherItem);

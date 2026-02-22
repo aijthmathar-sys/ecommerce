@@ -47,7 +47,7 @@ class OrderServiceImplTest {
 
         cartItem = new CartItem();
         cartItem.setProduct(product);
-        cartItem.setQuanity(2);
+        cartItem.setQuantity(2);
 
         cart = new Cart();
         cart.setId(1L);
