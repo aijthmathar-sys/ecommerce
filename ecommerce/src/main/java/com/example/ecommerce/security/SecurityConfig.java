@@ -35,24 +35,17 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
-                // 🔥 Swagger
                 .requestMatchers(
                         "/swagger-ui/**",
+                        "/swagger-ui.html",
                         "/v3/api-docs/**",
-                        "/swagger-ui.html"
+                        "/v3/api-docs",
+                        "/api/auth/**"
                 ).permitAll()
-
-                // 🔥 Auth endpoints (login/register)
-                .requestMatchers("/api/auth/**").permitAll()
-
-                // 🔥 Allow OPTIONS
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                // 🔐 All others secured
                 .anyRequest().authenticated()
             );
 
-        // 🔥 Add JWT filter
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
