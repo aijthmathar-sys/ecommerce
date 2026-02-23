@@ -40,6 +40,7 @@ if (path.startsWith("/api/auth/login") ||
     path.startsWith("/api/auth/register") ||
     path.startsWith("/v3/api-docs") ||
     path.startsWith("/swagger-ui") ||
+    path.startsWith("/error") ||
     path.startsWith("/swagger-ui.html")) {
 
     filterChain.doFilter(request, response);

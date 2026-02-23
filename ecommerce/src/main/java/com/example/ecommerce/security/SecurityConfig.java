@@ -37,7 +37,7 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                "/v3/api-docs",
+                "/v3/api-docs/**",
                 "/v3/api-docs/**",
                 "/swagger-ui/**",
                 "/swagger-ui.html"
@@ -54,8 +54,6 @@ public class SecurityConfig {
                 .requestMatchers("/cart/remove/**").hasRole("CUSTOMER")
                 .requestMatchers("/api/order/**").hasRole("CUSTOMER")
                 .requestMatchers("/api/payment/**").hasRole("CUSTOMER")
-                .requestMatchers("/api/auth/**").permitAll()
-            
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
