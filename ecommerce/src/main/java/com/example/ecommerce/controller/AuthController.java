@@ -1,17 +1,21 @@
 package com.example.ecommerce.controller;
 
+import com.example.ecommerce.dto.ForgotPasswordRequest;
 import com.example.ecommerce.dto.LoginRequest;
+import com.example.ecommerce.dto.ResetPasswordRequest;
 import com.example.ecommerce.entity.User;
 import com.example.ecommerce.security.JwtUtil;
 import com.example.ecommerce.service.UserService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -29,12 +33,12 @@ public class AuthController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
+    public ResponseEntity<?> register(@Valid @RequestBody User user) {
         return ResponseEntity.ok(userService.register(user));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request,
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request,
                                    HttpServletResponse response) {
 
         User user = userService.login(request);
@@ -99,18 +103,20 @@ public ResponseEntity<?> getCurrentUser(Authentication authentication) {
     ));
 }
 @PostMapping("/forgot-password")
-public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
+public ResponseEntity<?> forgotPassword(
+        @Valid @RequestBody ForgotPasswordRequest request) {
 
-    userService.sendOtp(body.get("email"));
+    userService.sendOtp(request.getEmail());
     return ResponseEntity.ok("OTP sent successfully");
 }
 @PostMapping("/reset-password")
-public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+public ResponseEntity<?> resetPassword(
+        @Valid @RequestBody ResetPasswordRequest request) {
 
     userService.resetPassword(
-            body.get("email"),
-            body.get("otp"),
-            body.get("newPassword")
+            request.getEmail(),
+            request.getOtp(),
+            request.getNewPassword()
     );
 
     return ResponseEntity.ok("Password reset successful");

@@ -1,37 +1,28 @@
 package com.example.ecommerce.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
 @Entity
-@Table(name="CARTITEMS")
+@Table(name = "CARTITEMS")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 public class CartItem {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Positive(message = "Quantity must be greater than 0")
     private int quantity;
+
     @ManyToOne
-    @JoinColumn(name="cartid")
-    @JsonBackReference
+    @JoinColumn(name = "cartid", nullable = false)
     private Cart cart;
+
     @ManyToOne
-    @JoinColumn(name="productid")
+    @JoinColumn(name = "productid", nullable = false)
     private Product product;
-} 
+}

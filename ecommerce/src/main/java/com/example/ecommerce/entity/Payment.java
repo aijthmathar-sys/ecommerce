@@ -1,36 +1,41 @@
 package com.example.ecommerce.entity;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 public class Payment {
-    
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String razorpayOrderId;
-    private String razorpayPaymentId;
-    private String razorpaySignature;
-    private double amount;
-    private String Status;
-    private LocalDateTime paymentDate;
-    private Long userId;
-    private Long orderId;
 
-    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank(message = "Razorpay Order ID is required")
+    private String razorpayOrderId;
+
+    @NotBlank(message = "Razorpay Payment ID is required")
+    private String razorpayPaymentId;
+
+    @NotBlank(message = "Razorpay Signature is required")
+    private String razorpaySignature;
+
+    @Positive(message = "Amount must be greater than 0")
+    private double amount;
+
+    @NotBlank(message = "Payment status is required")
+    private String status;
+
+    private LocalDateTime paymentDate;
+
+    @NotNull(message = "User ID is required")
+    private Long userId;
+
+    @NotNull(message = "Order ID is required")
+    private Long orderId;
 }

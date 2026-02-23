@@ -4,6 +4,9 @@ import com.example.ecommerce.dto.CartRequest;
 import com.example.ecommerce.entity.Cart;
 import com.example.ecommerce.entity.User;
 import com.example.ecommerce.service.CartService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +20,7 @@ public class CartController {
     private CartService cartService;
 
     @PostMapping("/add")
-    public Cart addToCart(
+    public Cart addToCart(@Valid
             @RequestBody CartRequest request,
             Authentication authentication) {
 
