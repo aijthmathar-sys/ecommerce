@@ -28,28 +28,36 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private UserRepository userRepository;
 
-    // 🔥 Tell Spring when NOT to run this filter
     @Override
-protected void doFilterInternal(HttpServletRequest request,
-                                HttpServletResponse response,
-                                FilterChain filterChain)
-        throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
 
-    try {
+        String path = request.getServletPath();
 
-        String token = null;
+        // 🔥 Skip Swagger & Auth endpoints
+        if (path.startsWith("/swagger-ui") ||
+            path.startsWith("/v3/api-docs") ||
+            path.startsWith("/api/auth")) {
 
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("jwt".equals(cookie.getName())) {
-                    token = cookie.getValue();
-                }
-            }
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        if (token != null) {
+        try {
 
-            if (jwtUtil.validateToken(token)) {
+            String token = null;
+
+            if (request.getCookies() != null) {
+                for (Cookie cookie : request.getCookies()) {
+                    if ("jwt".equals(cookie.getName())) {
+                        token = cookie.getValue();
+                    }
+                }
+            }
+
+            if (token != null && jwtUtil.validateToken(token)) {
 
                 String email = jwtUtil.extractEmail(token);
 
@@ -66,13 +74,11 @@ protected void doFilterInternal(HttpServletRequest request,
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             }
+
+        } catch (Exception e) {
+            SecurityContextHolder.clearContext();
         }
 
-    } catch (Exception e) {
-        // 🔥 VERY IMPORTANT: Never block request if token invalid
-        SecurityContextHolder.clearContext();
+        filterChain.doFilter(request, response);
     }
-
-    filterChain.doFilter(request, response);
-}
 }
