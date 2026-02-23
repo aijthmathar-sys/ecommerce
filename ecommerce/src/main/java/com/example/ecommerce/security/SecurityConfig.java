@@ -18,6 +18,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.Customizer;
 
 @Configuration
 @EnableWebSecurity
@@ -26,47 +27,26 @@ public class SecurityConfig {
     @Autowired
     private JwtFilter jwtFilter;
 
-   @Bean
+@Bean
 public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
     http
-        .cors(cors -> {})
         .csrf(csrf -> csrf.disable())
-        .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        )
+        .cors(cors -> {}) 
         .authorizeHttpRequests(auth -> auth
-
-            // 🔥 Swagger
+            // 🔥 Swagger permit
             .requestMatchers(
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html"
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/swagger-ui.html"
             ).permitAll()
 
-            // 🔥 Auth APIs
-            .requestMatchers("/api/auth/**").permitAll()
-
-            // 🔥 Admin
-            .requestMatchers("/api/admin/**").hasRole("ADMIN")
-
-            // 🔥 Products
-            .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-            .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
-            .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
-            .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
-
-            // 🔥 Customer APIs
-            .requestMatchers("/cart/**").hasRole("CUSTOMER")
-            .requestMatchers("/api/order/**").hasRole("CUSTOMER")
-            .requestMatchers("/api/payment/**").hasRole("CUSTOMER")
-
-            // 🔥 Allow preflight
+            // 🔥 Allow OPTIONS (CORS preflight)
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
             .anyRequest().authenticated()
         )
-        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        .httpBasic(Customizer.withDefaults()); // ✅ correct way
 
     return http.build();
 }
