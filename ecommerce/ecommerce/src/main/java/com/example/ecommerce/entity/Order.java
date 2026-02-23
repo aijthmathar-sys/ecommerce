@@ -6,8 +6,6 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @Entity
 @Data
 @NoArgsConstructor
@@ -30,6 +28,5 @@ public class Order {
     private String status;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     private List<OrderItem> orderItems;
 }

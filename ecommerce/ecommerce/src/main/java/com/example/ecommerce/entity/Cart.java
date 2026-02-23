@@ -5,8 +5,6 @@ import lombok.*;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @Entity
 @Table(name = "cart")
 @Data
@@ -23,6 +21,5 @@ public class Cart {
     private Long userId;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     private List<CartItem> cartItems;
 }

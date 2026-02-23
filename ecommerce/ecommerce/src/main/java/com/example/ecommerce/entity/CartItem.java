@@ -1,7 +1,5 @@
 package com.example.ecommerce.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -22,11 +20,9 @@ public class CartItem {
 
     @ManyToOne
     @JoinColumn(name = "cartid", nullable = false)
-    @JsonIgnore
     private Cart cart;
 
     @ManyToOne
     @JoinColumn(name = "productid", nullable = false)
-    @JsonIgnore
     private Product product;
 }
