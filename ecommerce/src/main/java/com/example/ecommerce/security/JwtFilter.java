@@ -1,32 +1,29 @@
 package com.example.ecommerce.security;
 
-import java.io.IOException;
-import java.util.List;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.example.ecommerce.entity.User;
-import com.example.ecommerce.repository.UserRepository;
+import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    private UserRepository userRepository;
+    public JwtFilter(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -34,46 +31,50 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        
-String path = request.getServletPath();
+        String path = request.getServletPath();
 
-if (path.contains("swagger") || path.contains("api-docs")) {
-    filterChain.doFilter(request, response);
-    return;
-}
-System.out.println("PATH="+request.getServletPath());
-        try {
+        // ✅ Allow Swagger & Auth endpoints without JWT
+        if (path.startsWith("/swagger-ui") ||
+                path.startsWith("/v3/api-docs") ||
+                path.startsWith("/swagger-ui.html") ||
+                path.startsWith("/auth")) {
 
-            String token = null;
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-            if (request.getCookies() != null) {
-                for (Cookie cookie : request.getCookies()) {
-                    if ("jwt".equals(cookie.getName())) {
-                        token = cookie.getValue();
-                    }
+        String token = null;
+
+        // ✅ Read JWT from cookie
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("jwt".equals(cookie.getName())) {
+                    token = cookie.getValue();
                 }
             }
+        }
 
-            if (token != null && jwtUtil.validateToken(token)) {
+        // ✅ Validate token and set authentication
+        if (token != null && jwtUtil.validateToken(token)) {
 
-                String email = jwtUtil.extractEmail(token);
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractRole(token);
 
-                User user = userRepository.findByEmail(email).orElse(null);
+            List<SimpleGrantedAuthority> authorities =
+                    List.of(new SimpleGrantedAuthority(role));
 
-                if (user != null) {
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(
-                                    user,
-                                    null,
-                                    List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
-                            );
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            email,
+                            null,
+                            authorities
+                    );
 
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                }
-            }
+            authentication.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request)
+            );
 
-        } catch (Exception e) {
-            SecurityContextHolder.clearContext();
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);
