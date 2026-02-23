@@ -26,41 +26,50 @@ public class SecurityConfig {
     @Autowired
     private JwtFilter jwtFilter;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+   @Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-            .cors(cors->{})
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session ->
+    http
+        .cors(cors -> {})
+        .csrf(csrf -> csrf.disable())
+        .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                "/v3/api-docs",
-                "/v3/api-docs/**",
-                "/v3/api-docs/**",
-                "/swagger-ui/**",
-                "/swagger-ui.html"
-                 ).permitAll()
-                 .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET,"/api/products/**").permitAll()
-                .requestMatchers(HttpMethod.POST,"/api/products/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT,"/api/products/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE,"/api/products/**").hasRole("ADMIN")
-                .requestMatchers("/cart/add/**").hasRole("CUSTOMER")
-                .requestMatchers("/cart/update/**").hasRole("CUSTOMER")
-                .requestMatchers("/cart/remove/**").hasRole("CUSTOMER")
-                .requestMatchers("/api/order/**").hasRole("CUSTOMER")
-                .requestMatchers("/api/payment/**").hasRole("CUSTOMER")
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        )
+        .authorizeHttpRequests(auth -> auth
 
-        return http.build();
-    }
+            // 🔥 Swagger
+            .requestMatchers(
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html"
+            ).permitAll()
+
+            // 🔥 Auth APIs
+            .requestMatchers("/api/auth/**").permitAll()
+
+            // 🔥 Admin
+            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+            // 🔥 Products
+            .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
+
+            // 🔥 Customer APIs
+            .requestMatchers("/cart/**").hasRole("CUSTOMER")
+            .requestMatchers("/api/order/**").hasRole("CUSTOMER")
+            .requestMatchers("/api/payment/**").hasRole("CUSTOMER")
+
+            // 🔥 Allow preflight
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+            .anyRequest().authenticated()
+        )
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+    return http.build();
+}
 
     @Bean
     public PasswordEncoder passwordEncoder() {
