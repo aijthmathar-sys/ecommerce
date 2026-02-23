@@ -30,25 +30,15 @@ public class JwtFilter extends OncePerRequestFilter {
 
     // 🔥 Tell Spring when NOT to run this filter
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getRequestURI();
+protected void doFilterInternal(HttpServletRequest request,
+                                HttpServletResponse response,
+                                FilterChain filterChain)
+        throws ServletException, IOException {
 
-        return path.startsWith("/api/auth/")
-                || path.startsWith("/v3/api-docs")
-                || path.startsWith("/swagger-ui")
-                || path.startsWith("/swagger-ui.html")
-                || path.startsWith("/error");
-    }
-
-    @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
+    try {
 
         String token = null;
 
-        // 🔥 Get JWT from cookie
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("jwt".equals(cookie.getName())) {
@@ -57,25 +47,32 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         }
 
-        // 🔥 Validate token
-        if (token != null && jwtUtil.validateToken(token)) {
+        if (token != null) {
 
-            String email = jwtUtil.extractEmail(token);
+            if (jwtUtil.validateToken(token)) {
 
-            User user = userRepository.findByEmail(email).orElse(null);
+                String email = jwtUtil.extractEmail(token);
 
-            if (user != null) {
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(
-                                user,
-                                null,
-                                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
-                        );
+                User user = userRepository.findByEmail(email).orElse(null);
 
-                SecurityContextHolder.getContext().setAuthentication(auth);
+                if (user != null) {
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(
+                                    user,
+                                    null,
+                                    List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
+                            );
+
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
             }
         }
 
-        filterChain.doFilter(request, response);
+    } catch (Exception e) {
+        // 🔥 VERY IMPORTANT: Never block request if token invalid
+        SecurityContextHolder.clearContext();
     }
+
+    filterChain.doFilter(request, response);
+}
 }
