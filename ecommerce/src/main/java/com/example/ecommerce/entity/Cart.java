@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "cart")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Cart {

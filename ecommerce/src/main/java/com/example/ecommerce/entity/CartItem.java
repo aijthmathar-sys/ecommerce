@@ -8,7 +8,6 @@ import lombok.*;
 
 @Entity
 @Table(name = "CARTITEMS")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartItem {

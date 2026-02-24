@@ -23,7 +23,6 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "USERS")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
