@@ -7,6 +7,8 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Payment {

@@ -6,6 +6,8 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderItem {

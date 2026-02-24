@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "orders")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Order {
